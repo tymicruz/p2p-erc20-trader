@@ -1,0 +1,20 @@
+networks:
+  development:
+    verify: False
+  mainnet-fork:
+    verify: False
+  mumbai:
+    verify: True
+  ganache:
+    verify: False
+  ftm-test:
+    verify: False
+  ftm-main:
+    verify: True
+  rinkeby:
+    verify: True
+  kovan:
+    verify: False
+dotenv: .env
+wallets:
+  from_key: ${PRIVATE_KEY}
