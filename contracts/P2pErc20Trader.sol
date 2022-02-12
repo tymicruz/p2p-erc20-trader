@@ -13,7 +13,7 @@ contract P2pErc20Trader {
         address recipient;
         IERC20 recipientToken;
         uint256 recipientTokenAmount;
-        uint256 expire;
+        uint256 expiration;
         bool isDeclined;
     }
 
@@ -43,7 +43,7 @@ contract P2pErc20Trader {
         address _recipient,
         address _recipientToken,
         uint256 _recipientTokenAmount,
-        uint256 _expire // time until this trade will expire.
+        uint256 _expiration // time until this trade will expire.
     ) external {
         require(isContract(msg.sender) && isContract(_recipient));
 
@@ -54,7 +54,7 @@ contract P2pErc20Trader {
             recipient: _recipient,
             recipientToken: IERC20(_recipientToken),
             recipientTokenAmount: _recipientTokenAmount,
-            expire: block.timestamp + _expire,
+            expiration: block.timestamp + _expiration,
             isDeclined: false
         });
 
@@ -76,12 +76,13 @@ contract P2pErc20Trader {
         return isProposerFunded && isRecipientFunded;
     }
 
+    // Only the recipient of the trade may accept it.
     function accept(uint256 _tradeId) external {
         Trade storage trade = trades[_tradeId];
 
         require(msg.sender == trade.recipient, "Not your trade.");
         require(!trade.isDeclined, "This trade has been declined.");
-        require(block.timestamp <= trade.expire, "Trade has expired.");
+        require(block.timestamp <= trade.expiration, "Trade has expired.");
 
         require(
             isTradeFunded(_tradeId),
@@ -103,6 +104,7 @@ contract P2pErc20Trader {
         require(success1 && success2, "Erc20 trade unsuccessful.");
     }
 
+    // Only the proposer or recipient of the trade may decline it.
     function decline(uint256 _tradeId) external {
         address proposer = trades[_tradeId].proposer;
         address recipient = trades[_tradeId].recipient;
@@ -112,17 +114,20 @@ contract P2pErc20Trader {
         trades[_tradeId].isDeclined = true;
     }
 
-    function getExpire(uint256 _tradeId) public view returns (uint256) {
-        return trades[_tradeId].expire;
+    // Get expiration of trade.
+    function getExpiration(uint256 _tradeId) public view returns (uint256) {
+        return trades[_tradeId].expiration;
     }
 
+    // Get time left before trade expires.
+    function getRemainingTime(uint256 _tradeId) public view returns (uint256) {
+        return trades[_tradeId].expiration - block.timestamp;
+    }
+
+    // Send tips to creator.
     function tipCreator() public payable {
         (bool success, ) = owner.call{value: msg.value}("");
         require(success);
-    }
-
-    function getContractBalance() public view returns (uint256) {
-        return address(this).balance;
     }
 
     function getMiscellaneousFundsSentToContract() public {
