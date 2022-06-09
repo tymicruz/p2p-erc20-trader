@@ -6,4 +6,4 @@ Sometimes defi protocol's don't provide an easy to use way trade certain tokens 
 
 When people try to OTC trade tokens, there is a high risk of being scammed as people usually just say "you send first and I'll send after." This method of trading completely ignores the power of the trustless nature of blockchain. I witnessed people doing this in a Discord server for a certain protocol and decided to make this smart contract. 
 
-This smart contract allows users to propose and accept trades of Erc20 tokens.
+This smart contract allows users to propose and accept trades of Erc20 tokens in a trustless way.
